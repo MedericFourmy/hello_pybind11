@@ -1,5 +1,6 @@
 import example
 
+print('Functions')
 print('add:')
 print(example.add(1,3))
 print('attributes:')
@@ -11,7 +12,16 @@ print(example.mult(2,3))
 
 import example_oop
 
-p = example_oop.Pet('jamy')
+print()
+print('OOP')
+p = example_oop.Pet('Jamy')
 print(p.getName())
 print(p.setName('Jo'))
 print(p.getName())
+p.name = 'Josy'  # name is explicitely bound and is public
+print(p.name)
+print(p)  # calls
+
+p2 = example_oop.Pet2('Jose')
+p2.name  # name is a property here
+print(p2.name)

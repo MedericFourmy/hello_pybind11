@@ -22,10 +22,28 @@ struct Pet {
     std::string name;
 };
 
+class Pet2 {
+public:
+    Pet2(const std::string &name) : name(name) { }
+    void setName(const std::string &name_) { name = name_; }
+    const std::string &getName() const { return name; }
+private:
+    std::string name;
+};
 
 PYBIND11_MODULE(example_oop, m) {
     py::class_<Pet>(m, "Pet")
         .def(py::init<const std::string &>())
         .def("setName", &Pet::setName)
-        .def("getName", &Pet::getName);
+        .def("getName", &Pet::getName)
+        .def("__repr__",
+        [](const Pet &a) {
+            return "<example.Pet named '" + a.name + "'>";
+        })  // possible to bind lambda functions!
+        .def_readwrite("name", &Pet::name)  // works only for public variables, also def_readonly for const attributes
+        ;
+
+    py::class_<Pet2>(m, "Pet2")
+        .def(py::init<const std::string &>())
+        .def_property("name", &Pet2::getName, &Pet2::setName);
 }
