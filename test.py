@@ -31,3 +31,8 @@ print(p2.name)
 p2.random_att_name = 'hey'  # OK cause p2 has dynamic attr
 # p2.name = 234324  # NOPE: name is declared as string, not dynamic
 print(p2.__dict__)
+
+# Inheritance
+d = example_oop.Dog("Milou")
+print(d.name)
+print(d.bark())

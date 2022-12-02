@@ -12,8 +12,6 @@ namespace py = pybind11;
 using namespace pybind11::literals;
 
 
-// Second module: OOP
-
 struct Pet {
     Pet(const std::string &name) : name(name) { }
     void setName(const std::string &name_) { name = name_; }
@@ -31,6 +29,10 @@ private:
     std::string name;
 };
 
+struct Dog : Pet {
+    Dog(const std::string &name) : Pet(name) { }
+    std::string bark() const { return "woof!"; }
+};
 
 PYBIND11_MODULE(example_oop, m) {
     py::class_<Pet>(m, "Pet")
@@ -48,4 +50,9 @@ PYBIND11_MODULE(example_oop, m) {
     py::class_<Pet2>(m, "Pet2", py::dynamic_attr())
         .def(py::init<const std::string &>())
         .def_property("name", &Pet2::getName, &Pet2::setName);
+
+    // inheritance
+    py::class_<Dog, Pet>(m, "Dog")
+        .def(py::init<const std::string &>())
+        .def("bark", &Dog::bark);
 }

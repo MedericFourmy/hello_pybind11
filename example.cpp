@@ -26,8 +26,6 @@ void def_mult(py::module &m) {
     m.def("mult", &mult, "Multiply 2 stuffs", "i"_a=2, "j"_a=4);
 }
 
-// First module: functions
-
 // example: module name
 // m: variable of type py::module_, main interface for creating bindings
 // module_::def(): creates binding code exposing the add function
