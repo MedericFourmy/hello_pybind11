@@ -31,6 +31,10 @@ PYBIND11_MODULE(example, m) {
     // default argument values
     m.def("add", &add, "A function that adds two numbers", py::arg("i")=1, py::arg("j")=2);
     m.def("add", &add, "A function that adds two numbers", "i"_a=1, "j"_a=2);
+    // Here, we have overloaded the add functions, which is not normally possible in python! 
 
-    // versions of the add functions: 
+    // exporting variables as module attributes
+    m.attr("the_answer") = 42;
+    py::object world = py::cast("World");
+    m.attr("what") = world;
 }
