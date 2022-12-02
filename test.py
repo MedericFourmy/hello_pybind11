@@ -8,3 +8,10 @@ print(example.what)
 print('mult:')
 print(example.mult())
 print(example.mult(2,3))
+
+import example_oop
+
+p = example_oop.Pet('jamy')
+print(p.getName())
+print(p.setName('Jo'))
+print(p.getName())
