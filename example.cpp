@@ -16,6 +16,16 @@ int add(int i, int j) {
     return i + j;
 }
 
+// refactoring the definitions
+int mult(int i, int j) {
+    return i * j;
+}
+void def_mult(py::module &m) {
+    m.def("mult", &mult, "Multiply 2 stuffs");
+    m.def("mult", &mult, "Multiply 2 stuffs", "i"_a, "j"_a);
+    m.def("mult", &mult, "Multiply 2 stuffs", "i"_a=2, "j"_a=4);
+}
+
 // example: module name
 // m: variable of type py::module_, main interface for creating bindings
 // module_::def(): creates binding code exposing the add function
@@ -32,6 +42,8 @@ PYBIND11_MODULE(example, m) {
     m.def("add", &add, "A function that adds two numbers", py::arg("i")=1, py::arg("j")=2);
     m.def("add", &add, "A function that adds two numbers", "i"_a=1, "j"_a=2);
     // Here, we have overloaded the add functions, which is not normally possible in python! 
+
+    def_mult(m);
 
     // exporting variables as module attributes
     m.attr("the_answer") = 42;
