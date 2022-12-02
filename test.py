@@ -25,3 +25,9 @@ print(p)  # calls
 p2 = example_oop.Pet2('Jose')
 p2.name  # name is a property here
 print(p2.name)
+
+# Dynamic attributes
+# p.random_att_name = 'hey'  # NOPE: dynamic attr not valid by default contrary to python objects 
+p2.random_att_name = 'hey'  # OK cause p2 has dynamic attr
+# p2.name = 234324  # NOPE: name is declared as string, not dynamic
+print(p2.__dict__)

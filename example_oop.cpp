@@ -31,6 +31,7 @@ private:
     std::string name;
 };
 
+
 PYBIND11_MODULE(example_oop, m) {
     py::class_<Pet>(m, "Pet")
         .def(py::init<const std::string &>())
@@ -43,7 +44,8 @@ PYBIND11_MODULE(example_oop, m) {
         .def_readwrite("name", &Pet::name)  // works only for public variables, also def_readonly for const attributes
         ;
 
-    py::class_<Pet2>(m, "Pet2")
+    // py::dynamic_attr() makes instance attributes dynamic as usually the case in Python 
+    py::class_<Pet2>(m, "Pet2", py::dynamic_attr())
         .def(py::init<const std::string &>())
         .def_property("name", &Pet2::getName, &Pet2::setName);
 }
