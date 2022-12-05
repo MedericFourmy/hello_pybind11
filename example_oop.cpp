@@ -12,6 +12,7 @@ namespace py = pybind11;
 using namespace pybind11::literals;
 
 
+// Base class
 struct Pet {
     Pet(const std::string &name) : name(name) { }
     void setName(const std::string &name_) { name = name_; }
@@ -20,6 +21,7 @@ struct Pet {
     std::string name;
 };
 
+// Non polymorphic inheritance
 class Pet2 {
 public:
     Pet2(const std::string &name) : name(name) { }
@@ -35,7 +37,7 @@ struct Dog : Pet {
 };
 
 
-// Polymorphic Dog and Pet: only need one virtual function
+// Polymorphic inheritance 
 struct PolymorphicPet {
     virtual ~PolymorphicPet() = default;
 };
@@ -58,6 +60,27 @@ struct Overlord {
     std::string name;
     int age;
 };
+
+
+// Internal types
+struct Bird {
+    enum Kind {
+        Crow = 0,
+        Goose
+    };
+
+    struct Attributes {
+        float age = 0;
+    };
+
+    Bird(const std::string &name, Kind type) : name(name), type(type) { }
+
+    std::string name;
+    Kind type;
+    Attributes attr;
+};
+
+
 
 PYBIND11_MODULE(example_oop, m) {
     // biding class methods is similar to binding 
@@ -115,4 +138,21 @@ PYBIND11_MODULE(example_oop, m) {
         .def("getName", py::overload_cast<>(&Overlord::getName), "Get the overlord's name")
         .def("getAge", py::overload_cast<>(&Overlord::getAge), "Get the overlord's age")
         .def("getAge", py::overload_cast<>(&Overlord::getAge, py::const_), "Get the overlord's age");  // const attibute overloading must be specified
+
+
+    // Internal types
+    py::class_<Bird> bird(m, "Bird");
+    bird.def(py::init<const std::string &, Bird::Kind>())
+        .def_readwrite("name", &Bird::name)
+        .def_readwrite("type", &Bird::type)
+        .def_readwrite("attr", &Bird::attr);
+
+    py::enum_<Bird::Kind>(bird, "Kind")
+        .value("Crow", Bird::Kind::Crow)
+        .value("Goose", Bird::Kind::Goose)
+        .export_values();
+
+    py::class_<Bird::Attributes>(bird, "Attributes")
+        .def(py::init<>())
+        .def_readwrite("age", &Bird::Attributes::age);
 }

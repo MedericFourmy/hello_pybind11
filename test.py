@@ -62,3 +62,11 @@ o.set('Sauron')
 o.set(42)
 print(o.getName(), o.getAge())
 
+# Internal types
+b = exoop.Bird("Lucy", exoop.Bird.Goose)
+print(b.type)
+print(int(b.type))
+print(b.Kind.__members__)  # enumeration types are exposed with "__"
+print(b.name)
+print(b.attr)
+
