@@ -2,7 +2,7 @@
 
 /*
 Building from CLI:
-c++ -O3 -Wall -shared -std=c++11 -fPIC $(python3-config --includes) -Iextern/pybind11/include example.cpp -o example$(python3-config --extension-suffix)
+c++ -O3 -Wall -shared -std=c++14 -fPIC $(python3-config --includes) -Iextern/pybind11/include example.cpp -o example$(python3-config --extension-suffix)
 -> requires cpython includes and pybin11 header only (here gotten as a git submodule) 
 */
 
@@ -16,10 +16,11 @@ int add(int i, int j) {
     return i + j;
 }
 
-// refactoring the definitions
+// refactoring the definitions and exploring overloading
 int mult(int i, int j) {
     return i * j;
 }
+
 void def_mult(py::module &m) {
     m.def("mult", &mult, "Multiply 2 stuffs");
     m.def("mult", &mult, "Multiply 2 stuffs", "i"_a, "j"_a);
