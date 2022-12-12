@@ -6,11 +6,6 @@
 
 
 
-/*
-Building from CLI:
-c++ -O3 -Wall -shared -std=c++14 -fPIC $(python3-config --includes) -Iextern/pybind11/include example_oop.cpp -o example_oop$(python3-config --extension-suffix)
--> requires cpython includes and pybin11 header only (here gotten as a git submodule) 
-*/
 namespace py = pybind11;
 
 // to be able to use "arg"_a shorthand
