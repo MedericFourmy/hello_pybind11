@@ -70,16 +70,30 @@ print(b.attr)
 
 
 # Eigen
-
 print()
 print('Eigen')
-print(hpb.eig_add_mat3d(np.eye(3), np.eye(3)))
+# type does not matter when passing by value: casting of array elements is done during copy
+print(hpb.eig_add_mat3d(np.eye(3, dtype=np.int32), np.eye(3, dtype=np.float128)))
 # print(hpb.compose_affine(np.eye(4), np.eye(4)))  # no implicit casting from numpy array to Eigen::Transform
 print(hpb.eig_compose_affine_mat(np.eye(4), np.eye(4)))
 # pass by reference, careful of the type!! float64 <-> double, float32 <-> float
-arr = np.arange(3).astype(np.float32)
+arr = np.arange(3, dtype=np.float32)
+# behavior of the returned array depends on the return type (const or not)
+arr_cref = hpb.eig_cref(arr, -2)
+arr_ccref = hpb.eig_ccref(arr, -2)
+print(arr_cref)
+print(arr.flags.owndata)
+print(arr_cref.flags.owndata)
+print(arr_cref.flags.writeable)
+print(arr_ccref.flags.writeable)  # arr_ccref[0] += 1 forbidden!
 hpb.eig_inplace_multiply_f(arr, 2.0)
 print(arr)
-arr = np.arange(3).astype(np.float64)
+arr = np.arange(5, dtype=np.float64)
 hpb.eig_inplace_multiply_d(arr, 3.0)
 print(arr)
+
+a = hpb.ClassEigen()
+m = a.get_matrix(); print('m: ', m.flags.owndata, m.flags.writeable)
+v = a.view_matrix(); print('v: ', v.flags.owndata, v.flags.writeable)
+c = a.copy_matrix(); print('c: ', c.flags.owndata, c.flags.writeable)
+# m[5,6] and v[5,6] refer to the same element, c[5,6] does not.

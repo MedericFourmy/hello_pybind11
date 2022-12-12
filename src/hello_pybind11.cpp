@@ -232,7 +232,6 @@ Matrix3d eig_add_mat3d(Matrix3d m1, Matrix3d m2){
     return m1 + m2;
 }
 
-// It seems like the only
 Matrix4d eig_compose_affine_mat(Matrix4d t1, Matrix4d t2){
     return (Affine3d(t1) * Affine3d(t2)).matrix();
 }
@@ -241,14 +240,28 @@ Affine3d eig_compose_affine(Affine3d t1, Affine3d t2){
     return t1 * t2;
 }
 
+Vector3f eig_cref(Ref<const Vector3f> v, double x){
+    return v * x;
+}
+
+const Vector3f eig_ccref(Ref<const Vector3f> v, double x){
+    return v * x;
+}
+
 void eig_inplace_multiply_f(Ref<Vector3f> v, double x){
     v *= x;
 }
 
-void eig_inplace_multiply_d(Ref<Vector3d> v, double x){
+void eig_inplace_multiply_d(Ref<VectorXd> v, double x){
     v *= x;
 }
 
+class ClassEigen {
+    Eigen::MatrixXd big_mat = Eigen::MatrixXd::Zero(10000, 10000);
+public:
+    Eigen::MatrixXd &getMatrix() { return big_mat; }
+    const Eigen::MatrixXd &viewMatrix() { return big_mat; }
+};
 
 
 PYBIND11_MODULE(hello_pybind11, m) {
@@ -256,8 +269,16 @@ PYBIND11_MODULE(hello_pybind11, m) {
     def_examples_oop(m);
 
     m.def("eig_add_mat3d", &eig_add_mat3d, "A function that adds two 3x3 matrices");
-    m.def("eig_compose_affine", &eig_compose_affine, "Compose Eigen transformations");
+    m.def("eig_compose_affine", &eig_compose_affine, "Compose Eigen transformations -> Compiles but bug on python side!");
     m.def("eig_compose_affine_mat", &eig_compose_affine_mat, "Compose Eigen transformations");
+    m.def("eig_cref", &eig_cref, "Checking const ref");
+    m.def("eig_ccref", &eig_ccref, "Checking const ref");
     m.def("eig_inplace_multiply_f", &eig_inplace_multiply_f, "Inplace multiply float");
     m.def("eig_inplace_multiply_d", &eig_inplace_multiply_d, "Inplace multiply double");
+    py::class_<ClassEigen>(m, "ClassEigen")
+        .def(py::init<>())
+        .def("copy_matrix", &ClassEigen::getMatrix) // Makes a copy!
+        .def("get_matrix", &ClassEigen::getMatrix, py::return_value_policy::reference_internal)
+        .def("view_matrix", &ClassEigen::viewMatrix, py::return_value_policy::reference_internal)
+        ;
 }
