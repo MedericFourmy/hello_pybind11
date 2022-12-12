@@ -1,5 +1,10 @@
 
 #include <pybind11/pybind11.h>
+#include <pybind11/eigen.h>
+#include <Eigen/Dense>
+#include <Eigen/Geometry> 
+
+
 
 /*
 Building from CLI:
@@ -220,8 +225,39 @@ void def_examples_oop(py::module &m) {
 ////////////////////////////////////////
 ////////////////////////////////////////
 
+using namespace Eigen;
+
+
+Matrix3d eig_add_mat3d(Matrix3d m1, Matrix3d m2){
+    return m1 + m2;
+}
+
+// It seems like the only
+Matrix4d eig_compose_affine_mat(Matrix4d t1, Matrix4d t2){
+    return (Affine3d(t1) * Affine3d(t2)).matrix();
+}
+
+Affine3d eig_compose_affine(Affine3d t1, Affine3d t2){
+    return t1 * t2;
+}
+
+void eig_inplace_multiply_f(Ref<Vector3f> v, double x){
+    v *= x;
+}
+
+void eig_inplace_multiply_d(Ref<Vector3d> v, double x){
+    v *= x;
+}
+
+
 
 PYBIND11_MODULE(hello_pybind11, m) {
     def_examples_func(m);
     def_examples_oop(m);
+
+    m.def("eig_add_mat3d", &eig_add_mat3d, "A function that adds two 3x3 matrices");
+    m.def("eig_compose_affine", &eig_compose_affine, "Compose Eigen transformations");
+    m.def("eig_compose_affine_mat", &eig_compose_affine_mat, "Compose Eigen transformations");
+    m.def("eig_inplace_multiply_f", &eig_inplace_multiply_f, "Inplace multiply float");
+    m.def("eig_inplace_multiply_d", &eig_inplace_multiply_d, "Inplace multiply double");
 }

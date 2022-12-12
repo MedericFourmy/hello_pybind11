@@ -17,8 +17,12 @@ __version__ = "0.0.1"
 #   reproducible builds (https://github.com/pybind/python_example/pull/53)
 
 ext_modules = [
-    Pybind11Extension("hello_pybind11",
-        ["src/hello_pybind11.cpp"],
+    Pybind11Extension(
+        name="hello_pybind11",
+        sources=["src/hello_pybind11.cpp"],
+        include_dirs=[
+            '/usr/include/eigen3/',  # Meh
+        ],
         # Example: passing in the version to the compiled code
         define_macros = [('VERSION_INFO', __version__)],
         ),

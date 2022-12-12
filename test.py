@@ -1,3 +1,4 @@
+import numpy as np
 import hello_pybind11 as hpb
 
 print('## Functions')
@@ -66,3 +67,19 @@ print(b.Kind.__members__)  # enumeration types are exposed with "__"
 print(b.name)
 print(b.attr)
 
+
+
+# Eigen
+
+print()
+print('Eigen')
+print(hpb.eig_add_mat3d(np.eye(3), np.eye(3)))
+# print(hpb.compose_affine(np.eye(4), np.eye(4)))  # no implicit casting from numpy array to Eigen::Transform
+print(hpb.eig_compose_affine_mat(np.eye(4), np.eye(4)))
+# pass by reference, careful of the type!! float64 <-> double, float32 <-> float
+arr = np.arange(3).astype(np.float32)
+hpb.eig_inplace_multiply_f(arr, 2.0)
+print(arr)
+arr = np.arange(3).astype(np.float64)
+hpb.eig_inplace_multiply_d(arr, 3.0)
+print(arr)
