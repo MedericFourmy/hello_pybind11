@@ -259,10 +259,7 @@ public:
 };
 
 
-PYBIND11_MODULE(hello_pybind11, m) {
-    def_examples_func(m);
-    def_examples_oop(m);
-
+void def_examples_eigen(py::module &m) {
     m.def("eig_add_mat3d", &eig_add_mat3d, "A function that adds two 3x3 matrices");
     m.def("eig_compose_affine", &eig_compose_affine, "Compose Eigen transformations -> Compiles but bug on python side!");
     m.def("eig_compose_affine_mat", &eig_compose_affine_mat, "Compose Eigen transformations");
@@ -270,10 +267,22 @@ PYBIND11_MODULE(hello_pybind11, m) {
     m.def("eig_ccref", &eig_ccref, "Checking const ref");
     m.def("eig_inplace_multiply_f", &eig_inplace_multiply_f, "Inplace multiply float");
     m.def("eig_inplace_multiply_d", &eig_inplace_multiply_d, "Inplace multiply double");
+
     py::class_<ClassEigen>(m, "ClassEigen")
         .def(py::init<>())
         .def("copy_matrix", &ClassEigen::getMatrix) // Makes a copy!
         .def("get_matrix", &ClassEigen::getMatrix, py::return_value_policy::reference_internal)
         .def("view_matrix", &ClassEigen::viewMatrix, py::return_value_policy::reference_internal)
         ;
+}
+
+///////////////////////////////////////// 
+///////////////////////////////////////// 
+///////////////////////////////////////// 
+
+
+PYBIND11_MODULE(hello_pybind11, m) {
+    def_examples_func(m);
+    def_examples_oop(m);
+    def_examples_eigen(m);
 }
