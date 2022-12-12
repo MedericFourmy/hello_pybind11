@@ -1,1 +1,7 @@
 .vscode
+# contains the compiled library and other object files
+build/  
+# when calling python -m build
+dist/
+hello_pybind11.cpython-38-x86_64-linux-gnu.so
+hello_pybind11.egg-info/

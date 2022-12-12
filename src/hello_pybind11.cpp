@@ -30,7 +30,7 @@ void def_mult(py::module &m) {
 // example: module name
 // m: variable of type py::module_, main interface for creating bindings
 // module_::def(): creates binding code exposing the add function
-PYBIND11_MODULE(example, m) {
+PYBIND11_MODULE(hello_pybind11, m) {
     m.doc() = "pybind11 example plugin"; // optional module docstring
 
     // arguments without any name
