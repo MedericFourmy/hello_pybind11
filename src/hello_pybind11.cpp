@@ -16,7 +16,8 @@ int add(int i, int j) {
     return i + j;
 }
 
-// refactoring the definitions and exploring overloading
+// check default parameter behavior
+int mult(int i, int j=2);  // !! default C++ arguments are only syntactic sugar: pybind11 cannot handle them!
 int mult(int i, int j) {
     return i * j;
 }
@@ -81,6 +82,7 @@ private:
 };
 
 struct Dog : Pet {
+    Dog() : Pet("AtomicDog") { }
     Dog(const std::string &name) : Pet(name) { }
     std::string bark() const { return "woof!"; }
 };
@@ -136,7 +138,7 @@ void basic_class_def(py::module &m){
     // py::init<const std::string &>() is kind of expanding to: "__init__", &Pet::Pet
     // except that C++98 Standard $12.1/10: “The address of a constructor shall not be taken.” -> this syntax is not possible
     py::class_<Pet>(m, "Pet")
-        .def(py::init<const std::string &>())  // if not: TypeError: example_oop.Pet: No constructor defined!
+        .def(py::init<const std::string &>())  // if not: TypeError: Pet: No constructor defined!
         .def("getName", &Pet::getName)
         .def("setName", &Pet::setName)
         .def("__repr__",
@@ -157,6 +159,7 @@ void checking_inheritance_polymorphism(py::module &m){
     // Inheritance: specify base class as extra template parameter
     // Base class bound methods/attributes are also inherited by the derived bindings
     py::class_<Dog, Pet>(m, "Dog")
+        .def(py::init<>())
         .def(py::init<const std::string &>())
         .def("bark", &Dog::bark);
     m.def("pet_store", []() { return std::unique_ptr<Pet>(new Dog("Molly")); });  // just to show non-polymorphic inheritance resulting behaviour

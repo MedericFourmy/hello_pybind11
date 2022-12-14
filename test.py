@@ -33,6 +33,8 @@ p2.random_att_name = 'hey'  # OK cause p2 has dynamic attr
 print(p2.__dict__)
 
 # Inheritance
+d = hpb.Dog()
+print(d.getName())
 d = hpb.Dog("Milou")
 print(d.getName())
 d.setName('Loumi')
