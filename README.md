@@ -5,7 +5,8 @@ Learning about pybind11 and documenting it
 
 Build
 -----
-`pip install -e .`
+- `pip install -e .` -- development mode  
+- `pip install .` -- installation in site-packages
 
 Run
 ---
@@ -14,7 +15,9 @@ Run
 
 TODO
 ----
-Figure out how to separate examples in several files
+- Figure out why `pip install .` puts the .so module file directly in `site-pacakages`
+- pytest
+- entrypoints
 
 Sources
 ----

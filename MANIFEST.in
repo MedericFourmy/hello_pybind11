@@ -1,0 +1,7 @@
+# header files specified in setup.py are not automatically copied when creating the source distribution
+# with python -m build --sdist or as a pip install . step.
+# MANIFEST.in is used to tell setuptools to copy them
+
+# Options:
+include include/hello_pybind11/*.h
+# recursive-include include/hello_pybind11 *.h

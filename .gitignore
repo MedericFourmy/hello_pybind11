@@ -1,7 +1,11 @@
 .vscode
+# generated when calling python -m build [--sdist] [--wheel]:
 # contains the compiled library and other object files
 build/  
-# when calling python -m build
+# contains egg-info and/or a .whl archive (dist-info/ + .so)
 dist/
-hello_pybind11.cpython-38-x86_64-linux-gnu.so
+# metadata about the package (always generated somehow)
 hello_pybind11.egg-info/
+
+# shared library generated when calling pip install -e .
+*.so
