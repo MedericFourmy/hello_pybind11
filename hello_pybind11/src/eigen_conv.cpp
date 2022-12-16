@@ -45,9 +45,11 @@ public:
 };
 
 
+
+
 void def_examples_eigen_conv(py::module &m) {
     m.def("eig_add_mat3d", &eig_add_mat3d, "A function that adds two 3x3 matrices");
-    m.def("eig_compose_affine", &eig_compose_affine, "Compose Eigen transformations -> Compiles but bug on python side!");
+    m.def("eig_compose_affine", &eig_compose_affine, "Compose Eigen transformations -> Compiles but bug on python side because not in/out implicit comversion!");
     m.def("eig_compose_affine_mat", &eig_compose_affine_mat, "Compose Eigen transformations");
     m.def("eig_cref", &eig_cref, "Checking const ref");
     m.def("eig_ccref", &eig_ccref, "Checking const ref");

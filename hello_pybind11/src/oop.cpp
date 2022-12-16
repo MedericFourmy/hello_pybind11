@@ -4,6 +4,8 @@ namespace py = pybind11;
 // to be able to use "arg"_a shorthand
 using namespace pybind11::literals;
 
+
+
 // Base class
 struct Pet {
     Pet(const std::string &name) : name(name) { }
@@ -12,67 +14,6 @@ struct Pet {
 
     std::string name;
 };
-
-// Non polymorphic inheritance
-class Pet2 {
-public:
-    Pet2(const std::string &name) : name(name) { }
-    void setName(const std::string &name_) { name = name_; }
-    const std::string &getName() const { return name; }
-private:
-    std::string name;
-};
-
-struct Dog : Pet {
-    Dog() : Pet("AtomicDog") { }
-    Dog(const std::string &name) : Pet(name) { }
-    std::string bark() const { return "woof!"; }
-};
-
-
-// Polymorphic inheritance 
-struct PolymorphicPet {
-    virtual ~PolymorphicPet() = default;
-};
-
-struct PolymorphicDog : PolymorphicPet {
-    std::string bark() const { return "woof!"; }
-};
-
-
-// Overloading functions
-struct Overlord {
-    Overlord(const std::string &name, int age) : name(name), age(age) { }
-
-    void set(int age_) { age = age_; }
-    void set(const std::string &name_) { name = name_; }
-    std::string getName() {return name;}
-    int getAge() {return age;}
-    int getAge() const {return age;}
-
-    std::string name;
-    int age;
-};
-
-
-// Internal types
-struct Bird {
-    enum Kind {
-        Crow = 0,
-        Goose
-    };
-
-    struct Attributes {
-        float age = 0;
-    };
-
-    Bird(const std::string &name, Kind type) : name(name), type(type) { }
-
-    std::string name;
-    Kind type;
-    Attributes attr;
-};
-
 
 void basic_class_def(py::module &m){
     // biding class methods is similar to binding 
@@ -90,6 +31,32 @@ void basic_class_def(py::module &m){
         .def_readwrite("name", &Pet::name)  // works only for public variables, also def_readonly for const attributes
         ;
 }
+
+// Non polymorphic inheritance
+class Pet2 {
+public:
+    Pet2(const std::string &name) : name(name) { }
+    void setName(const std::string &name_) { name = name_; }
+    const std::string &getName() const { return name; }
+private:
+    std::string name;
+};
+
+struct Dog : Pet {
+    Dog() : Pet("AtomicDog") { }
+    Dog(const std::string &name) : Pet(name) { }
+    std::string bark() const { return "woof!"; }
+};
+
+// Polymorphic inheritance 
+struct PolymorphicPet {
+    virtual ~PolymorphicPet() = default;
+};
+
+struct PolymorphicDog : PolymorphicPet {
+    std::string bark() const { return "woof!"; }
+};
+
 
 void checking_inheritance_polymorphism(py::module &m){
     // Non polymorphic inheritance
@@ -118,6 +85,24 @@ void checking_inheritance_polymorphism(py::module &m){
 }
 
 
+
+
+
+// Overloading functions
+struct Overlord {
+    Overlord(const std::string &name, int age) : name(name), age(age) { }
+
+    void set(int age_) { age = age_; }
+    void set(const std::string &name_) { name = name_; }
+    std::string getName() {return name;}
+    int getAge() {return age;}
+    int getAge() const {return age;}
+
+    std::string name;
+    int age;
+};
+
+
 void overloading_functions(py::module &m){
     // // Heavy notation for c++11 compatibility: have to specify the return type
     // py::class_<Overlord>(m, "Overlord")
@@ -135,6 +120,27 @@ void overloading_functions(py::module &m){
         .def("getAge", py::overload_cast<>(&Overlord::getAge, py::const_), "Get the overlord's age");  // const attibute overloading must be specified
 
 }
+
+
+
+
+// Internal types
+struct Bird {
+    enum Kind {
+        Crow = 0,
+        Goose
+    };
+
+    struct Attributes {
+        float age = 0;
+    };
+
+    Bird(const std::string &name, Kind type) : name(name), type(type) { }
+
+    std::string name;
+    Kind type;
+    Attributes attr;
+};
 
 void internal_types(py::module &m){
     // Internal types
@@ -154,9 +160,69 @@ void internal_types(py::module &m){
         .def_readwrite("age", &Bird::Attributes::age);
 }
 
+
+// Custom Constructors 
+// 1: private constructors, happens quite rarely :
+// acccording to https://www.geeksforgeeks.org/can-constructor-private-cpp/
+// usecases involve Using Friend Classes (only some classes can create this object class), Singleton design pattern, Named Constructor design pattern 
+// Possible to bind factory function as static function
+
+class ExampleCCprivate {
+    private:
+        ExampleCCprivate(int i) : i_(i) {} // private constructor, original example
+
+    public:
+        // Factory function:
+        static ExampleCCprivate create(int a) { return ExampleCCprivate(a);} 
+        int i_; // public just to avoid defining a getter
+};
+
+// NOT possible because ExampleCCprivate::ExampleCCprivate constructor is private!
+// ExampleCCprivate create(int a) { return ExampleCCprivate(a);} 
+
+// If constructor is public, constructor function should be available outside
+class ExampleCCpublic {
+    public:
+        ExampleCCpublic(int i) : i_(i) {} // public constructor
+
+        int i_; // public just to avoid defining a getter
+};
+
+// implements a static cast in the function and then pass to the constructor (is it bad practice?)
+ExampleCCpublic create_pub(double a) { return ExampleCCpublic((int)a);} 
+
+
+// // Even if constructor is private, we can create a base class
+// class PySimpleHack: public ExampleCCprivate {
+//     public:
+//         PySimpleHack(double d) {
+//             ExampleCCprivate::ExampleCCprivate((int)i);
+//         }
+// };
+
+
+// When a constructor with appropriate arguments does not exist on C++ side
+void custom_constructors(py::module &m){
+    py::class_<ExampleCCprivate>(m, "ExampleCCprivate")
+        .def(py::init(&ExampleCCprivate::create))
+        .def_readwrite("i", &ExampleCCprivate::i_);
+        // .def(py::init(&create));  // NOPE
+
+    py::class_<ExampleCCpublic>(m, "ExampleCCpublic")
+        .def(py::init(&create_pub))
+        .def_readwrite("i", &ExampleCCpublic::i_);
+        // .def(py::init(&create));  // NOPE
+
+    // py::class_<PySimpleHack>(m, "ExampleCC")
+    //     .def(py::init<double>())
+    //     .def_readwrite("i", &PySimpleHack::i_);
+
+};
+
 void def_examples_oop(py::module &m) {
     basic_class_def(m);
     checking_inheritance_polymorphism(m);
     overloading_functions(m);
     internal_types(m);
+    custom_constructors(m);
 }

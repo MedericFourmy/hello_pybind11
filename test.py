@@ -69,6 +69,11 @@ print(b.Kind.__members__)  # enumeration types are exposed with "__"
 print(b.name)
 print(b.attr)
 
+# Custom constructors
+epri = hpb.ExampleCCprivate(12)
+epub = hpb.ExampleCCpublic(34)
+print(epri.i)
+print(epub.i)
 
 
 # Eigen
