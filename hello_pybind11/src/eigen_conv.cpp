@@ -1,4 +1,5 @@
 #include "hello_pybind11/eigen_conv.h"
+#include "hello_pybind11/type_casters_utils.h"
 
 #include <pybind11/eigen.h>
 
@@ -45,6 +46,10 @@ public:
 };
 
 
+Quaterniond eig_quat_mult(Quaterniond q1, Quaterniond q2){
+    return q1 * q2;
+}
+
 
 
 void def_examples_eigen_conv(py::module &m) {
@@ -62,4 +67,7 @@ void def_examples_eigen_conv(py::module &m) {
         .def("get_matrix", &ClassEigen::getMatrix, py::return_value_policy::reference_internal)
         .def("view_matrix", &ClassEigen::viewMatrix, py::return_value_policy::reference_internal)
         ;
+    
+    m.def("eig_quat_mult", &eig_quat_mult, "Multiply two quaternions");
+
 }

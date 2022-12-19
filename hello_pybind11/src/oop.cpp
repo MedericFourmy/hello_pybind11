@@ -5,6 +5,9 @@ namespace py = pybind11;
 using namespace pybind11::literals;
 
 
+// TODO: 
+// Check behavior of special holder types (see https://pybind11.readthedocs.io/en/stable/advanced/smart_ptrs.html?highlight=PYBIND11_DECLARE_HOLDER_TYPE#custom-smart-pointers)
+
 
 // Base class
 struct Pet {

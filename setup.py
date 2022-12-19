@@ -43,3 +43,7 @@ setup(
     zip_safe=False,
     python_requires='>=3.7',
 )
+
+
+# TODO: add runtime dependencies
+# numpy-quaternion

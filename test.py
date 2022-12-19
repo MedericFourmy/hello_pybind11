@@ -1,4 +1,6 @@
+import time
 import numpy as np
+import quaternion  # use as np.quaternion
 import hello_pybind11 as hpb
 
 print('## Functions')
@@ -102,5 +104,26 @@ print(arr)
 a = hpb.ClassEigen()
 m = a.get_matrix(); print('m: ', m.flags.owndata, m.flags.writeable)
 v = a.view_matrix(); print('v: ', v.flags.owndata, v.flags.writeable)
+t = time.time()
+# ClassEigen defines a 1e4 x 1e4 = 1e8 size matrix -> copy takes almost a second, normal
 c = a.copy_matrix(); print('c: ', c.flags.owndata, c.flags.writeable)
+print('a.copy_matrix() took (s): ', time.time() - t)
 # m[5,6] and v[5,6] refer to the same element, c[5,6] does not.
+
+t1 = time.time()
+q1 = np.arange(4)
+q2 = np.arange(4)
+# np.quaternion uses the same convention as Eigen for constructing quaternion
+# from individual elements BUT also for internal storage (?) / viewing
+# np.quaternion: w,x,y,z
+qq1 = np.quaternion(q1[3], q1[0], q1[1], q1[2])
+qq2 = np.quaternion(q2[3], q2[0], q2[1], q2[2])
+
+
+t2 = time.time()
+# copy one quaternion, alright
+q3 = hpb.eig_quat_mult(q1, q2)
+print('eig_quat_mult took (s): ', time.time() - t2)
+qq3 = qq1 * qq2
+print(q3)
+print(qq3.x, qq3.y, qq3.z, qq3.w)
