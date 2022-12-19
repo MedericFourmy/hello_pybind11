@@ -29,6 +29,8 @@ class type_caster<Eigen::Quaternion<Scalar>> {
   bool load(py::handle src, bool) {
     // If src is a quaternion, extract its values
     if (py::isinstance<py::array>(src)) {
+      // Scalar toto = 2.0; // OK!
+    //   py::array_t<Scalar> array = src.cast<py::array_t<Scalar>>();  // NOT OK! -> Check some examples from pydrake
       py::array_t<double> array = src.cast<py::array_t<double>>();
       if (array.ndim() == 1 && array.shape(0) == 4) {
         auto r = array.unchecked<1>(); // static check of ndim
