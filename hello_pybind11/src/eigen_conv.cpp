@@ -46,7 +46,11 @@ public:
 };
 
 
-Quaterniond eig_quat_mult(Quaterniond q1, Quaterniond q2){
+Quaterniond eig_quatd_mult(Quaterniond q1, Quaterniond q2){
+    return q1 * q2;
+}
+
+Quaternionf eig_quatf_mult(Quaternionf q1, Quaternionf q2){
     return q1 * q2;
 }
 
@@ -68,6 +72,7 @@ void def_examples_eigen_conv(py::module &m) {
         .def("view_matrix", &ClassEigen::viewMatrix, py::return_value_policy::reference_internal)
         ;
     
-    m.def("eig_quat_mult", &eig_quat_mult, "Multiply two quaternions");
+    m.def("eig_quatd_mult", &eig_quatd_mult, "Multiply two float quaternions");
+    m.def("eig_quatf_mult", &eig_quatf_mult, "Multiply two double quaternions");
 
 }

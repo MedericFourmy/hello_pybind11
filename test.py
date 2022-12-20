@@ -120,10 +120,21 @@ qq1 = np.quaternion(q1[3], q1[0], q1[1], q1[2])
 qq2 = np.quaternion(q2[3], q2[0], q2[1], q2[2])
 
 
-t2 = time.time()
 # copy one quaternion, alright
-q3 = hpb.eig_quat_mult(q1, q2)
-print('eig_quat_mult took (s): ', time.time() - t2)
+qd3 = hpb.eig_quatd_mult(q1, q2)
+qf3 = hpb.eig_quatf_mult(q1, q2)
+print('qd3: ', qd3, qd3.dtype)
+print('qf3: ', qf3, qf3.dtype)
+
+print('Cast q1, q2 to float32 (C++ floats)')
+q1 = np.array(q1, dtype=np.float32)
+q2 = np.array(q2, dtype=np.float32)
+print('q1: ', q1, q1.dtype)
+print('q2: ', q2, q2.dtype)
+qd3 = hpb.eig_quatd_mult(q1, q2)
+qf3 = hpb.eig_quatf_mult(q1, q2)
+print('qd3: ', qd3, qd3.dtype)
+print('qf3: ', qf3, qf3.dtype)
 qq3 = qq1 * qq2
-print(q3)
-print(qq3.x, qq3.y, qq3.z, qq3.w)
+print('Check computation is ok')
+print('qq3:', qq3.x, qq3.y, qq3.z, qq3.w)
