@@ -45,12 +45,9 @@ public:
     const MatrixXd &viewMatrix() { return big_mat; }
 };
 
-
-Quaterniond eig_quatd_mult(Quaterniond q1, Quaterniond q2){
-    return q1 * q2;
-}
-
-Quaternionf eig_quatf_mult(Quaternionf q1, Quaternionf q2){
+// templatized version -> not possible to bind! https://github.com/pybind/pybind11/issues/281#issuecomment-232655034
+template <typename Scalar>
+Quaternion<Scalar> eig_quat_mult(Quaternion<Scalar> q1, Quaternion<Scalar> q2){
     return q1 * q2;
 }
 
@@ -72,7 +69,26 @@ void def_examples_eigen_conv(py::module &m) {
         .def("view_matrix", &ClassEigen::viewMatrix, py::return_value_policy::reference_internal)
         ;
     
-    m.def("eig_quatd_mult", &eig_quatd_mult, "Multiply two float quaternions");
-    m.def("eig_quatf_mult", &eig_quatf_mult, "Multiply two double quaternions");
+    // we need to instantiate template functions
+    m.def("eig_quat_mult", &eig_quat_mult<double>, "Multiply two float quaternions");
+    m.def("eig_quat_mult", &eig_quat_mult<float>, "Multiply two double quaternions");
+
+
+    m.def("sum_3d", [](py::array_t<double> x) {
+        auto r = x.unchecked<3>(); // x must have ndim = 3; can be non-writeable
+        double sum = 0;
+        for (py::ssize_t i = 0; i < r.shape(0); i++)
+            for (py::ssize_t j = 0; j < r.shape(1); j++)
+                for (py::ssize_t k = 0; k < r.shape(2); k++)
+                    sum += r(i, j, k);
+        return sum;
+    }, "Sum elements of a 3 dimensional tensfor");
+    m.def("increment_3d", [](py::array_t<double> x) {
+        auto r = x.mutable_unchecked<3>(); // Will throw if ndim != 3 or flags.writeable is false
+        for (py::ssize_t i = 0; i < r.shape(0); i++)
+            for (py::ssize_t j = 0; j < r.shape(1); j++)
+                for (py::ssize_t k = 0; k < r.shape(2); k++)
+                    r(i, j, k) += 1.0;
+    }, "Increment a 3 dimensional tensfor", py::arg().noconvert());  // FORBID implicit convesions in array type (e.g. int->double)
 
 }

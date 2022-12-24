@@ -2,6 +2,9 @@
 #include <pybind11/pybind11.h>
 // #include <pybind11/numpy.h>
 
+#include <Eigen/Dense>
+#include <Eigen/Geometry>
+
 namespace py = pybind11;
 
 // To be able to use std::shared_ptr class_ holder type (default is std::unique_ptr -> "the object is deallocated when Python’s reference count goes to zero.") 
@@ -10,15 +13,25 @@ namespace py = pybind11;
 namespace pybind11 {
 namespace detail {
 
+/* !! using a templatized type_caster is actually very important to support all functions that require Quaternions
+ * If we only use Eigen::Quaterniond, then we will have the following error when calling `eig_quatf_mult`
+ *       TypeError: eig_quatf_mult(): incompatible function arguments. The following argument types are supported:
+ *           1. (arg0: Eigen::Quaternion<float, 0>, arg1: Eigen::Quaternion<float, 0>) -> Eigen::Quaternion<float, 0>
+ * 
+ **/
 template <typename Scalar>
 class type_caster<Eigen::Quaternion<Scalar>> {
  public:
   /**
-   * This macro establishes the name 'Quaternion' in
+   * 
+   * This macro establishes the name 'Eigen::Quaternion<Scalar>' in
    * function signatures and declares a local variable
    * 'value' of type Eigen::Quaternion<Scalar>.
    * 
    * Note: "A type_caster<T> defined with PYBIND11_TYPE_CASTER(T, ...) requires that T is default-constructible (value is first default constructed and then load() assigns to it)."
+   * 
+   * See https://github.com/pybind/pybind11/blob/0694ec6a15863bff2e0ea5efe07c78de39b9a33c/include/pybind11/cast.h#L85
+   * for macro definition
    */
   PYBIND11_TYPE_CASTER(Eigen::Quaternion<Scalar>, _("Eigen::Quaternion<Scalar>"));
 
@@ -60,6 +73,7 @@ class type_caster<Eigen::Quaternion<Scalar>> {
     return array.release();
   }
 };
+
 
 }  // namespace detail
 }  // namespace pybind11

@@ -1,3 +1,4 @@
+#include <iostream>
 #include <pybind11/pybind11.h>
 
 #include "hello_pybind11/functions.h"
@@ -14,7 +15,13 @@ int add(int i, int j) {
 // check default parameter behavior
 int mult(int i, int j=2);  // !! default C++ arguments are only syntactic sugar: pybind11 cannot handle them!
 int mult(int i, int j) {
+    std::cout << "functions::mult-int\n"; 
     return i * j;
+}
+
+double multd(double x, double y){
+    std::cout << "functions::multd-double\n"; 
+    return x * y;
 }
 
 void def_add(py::module &m) {
@@ -31,9 +38,18 @@ void def_add(py::module &m) {
 }
 
 void def_mult(py::module &m) {
-    m.def("mult", &mult, "Multiply 2 stuffs");
-    m.def("mult", &mult, "Multiply 2 stuffs", "i"_a, "j"_a);
-    m.def("mult", &mult, "Multiply 2 stuffs", "i"_a=2, "j"_a=4);
+    m.def("mult", &mult, "Multiply 2 ints");
+    m.def("mult", &mult, "Multiply 2 ints", "i"_a, "j"_a);
+    m.def("mult", &mult, "Multiply 2 ints", "i"_a=2, "j"_a=4);
+
+    /**
+        Which not overload of the function is chosen by pybind11 at runtime ?
+       -> try them all sequentially:
+       - first pass trying to call all overloads without type enabled conversion
+       - second pass where arg conversion is allowed (except if specified with py::arg().noconvert())
+    */
+    m.def("mult", &multd, "Multiply 2 doubles", "x"_a, "y"_a);
+
 }
 
 void def_module_attributes(py::module &m) {
@@ -42,6 +58,7 @@ void def_module_attributes(py::module &m) {
     py::object world = py::cast("World");
     m.attr("what") = world;
 }
+
     
 void def_examples_func(py::module &m) {
     def_add(m);
