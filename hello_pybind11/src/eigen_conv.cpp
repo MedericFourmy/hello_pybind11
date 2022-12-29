@@ -52,6 +52,9 @@ Quaternion<Scalar> eig_quat_mult(Quaternion<Scalar> q1, Quaternion<Scalar> q2){
 }
 
 
+Eigen::Transform<double, 3, Eigen::Affine> pass_through(Eigen::Transform<double, 3, Eigen::Affine> M){
+    return M;
+}
 
 void def_examples_eigen_conv(py::module &m) {
     m.def("eig_add_mat3d", &eig_add_mat3d, "A function that adds two 3x3 matrices");
@@ -91,4 +94,5 @@ void def_examples_eigen_conv(py::module &m) {
                     r(i, j, k) += 1.0;
     }, "Increment a 3 dimensional tensfor", py::arg().noconvert());  // FORBID implicit convesions in array type (e.g. int->double)
 
+    m.def("pass_through", &pass_through, "Returns the same transform it was");
 }

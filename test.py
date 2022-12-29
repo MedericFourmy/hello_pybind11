@@ -150,3 +150,9 @@ print(hpb.sum_3d(a))
 a = a.astype(np.float64)  # we have enforced increment_3d to work only with double == float64
 hpb.increment_3d(a)
 print(hpb.sum_3d(a))
+
+# numpy to Eigen::Transform
+m1 = np.arange(16).reshape((4,4))
+print("m1\n", m1)
+m2 = hpb.pass_through(m1)
+print("m2\n", m2)
