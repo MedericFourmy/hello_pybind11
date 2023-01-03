@@ -5,6 +5,15 @@
 
 #include <Eigen/Dense>
 
+
+/**
+ * TODO:
+ * - understand why template specialization overloads of eig_quat_mult always resolves to the FIRST def!
+ * when called in python (np.float32 or np.float64, pr np.int32 does not matter for some reason)
+ * 
+*/
+
+
 namespace py = pybind11;
 // to be able to use "arg"_a shorthand
 using namespace pybind11::literals;
@@ -48,11 +57,12 @@ public:
 // templatized version -> not possible to bind! https://github.com/pybind/pybind11/issues/281#issuecomment-232655034
 template <typename Scalar>
 Quaternion<Scalar> eig_quat_mult(Quaternion<Scalar> q1, Quaternion<Scalar> q2){
+    std::cout << "eig_quat_mult: " << typeid(Scalar).name() << "\n";
     return q1 * q2;
 }
 
-
-Eigen::Transform<double, 3, Eigen::Affine> pass_through(Eigen::Transform<double, 3, Eigen::Affine> M){
+template <typename Scalar>
+Eigen::Transform<Scalar, 3, Eigen::Affine> pass_through(Eigen::Transform<Scalar, 3, Eigen::Affine> M){
     return M;
 }
 
@@ -73,9 +83,9 @@ void def_examples_eigen_conv(py::module &m) {
         ;
     
     // we need to instantiate template functions
-    m.def("eig_quat_mult", &eig_quat_mult<double>, "Multiply two float quaternions");
-    m.def("eig_quat_mult", &eig_quat_mult<float>, "Multiply two double quaternions");
-
+    m.def("eig_quat_mult", &eig_quat_mult<int>, "Multiply two int quaternions", py::arg().noconvert("q1"), py::arg("q2").noconvert());
+    m.def("eig_quat_mult", &eig_quat_mult<float>, "Multiply two float quaternions", py::arg().noconvert("q1"), py::arg("q2").noconvert());
+    m.def("eig_quat_mult", &eig_quat_mult<double>, "Multiply two double quaternions", py::arg().noconvert("q1"), py::arg("q2").noconvert());
 
     m.def("sum_3d", [](py::array_t<double> x) {
         auto r = x.unchecked<3>(); // x must have ndim = 3; can be non-writeable
@@ -94,5 +104,6 @@ void def_examples_eigen_conv(py::module &m) {
                     r(i, j, k) += 1.0;
     }, "Increment a 3 dimensional tensfor", py::arg().noconvert());  // FORBID implicit convesions in array type (e.g. int->double)
 
-    m.def("pass_through", &pass_through, "Returns the same transform it was");
+    m.def("pass_through", &pass_through<double>, "Returns the same transform it was (double)");
+    m.def("pass_through", &pass_through<float>, "Returns the same transform it was (float)");
 }

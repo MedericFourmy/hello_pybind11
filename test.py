@@ -17,8 +17,7 @@ print(hpb.mult(2,3))
 print(hpb.mult(2.0,3.0))
 
 
-print()
-print(____ + '\n# OOP' + ____)
+print('\n' + ____ + '\n# OOP' + ____)
 p = hpb.Pet('Jamy')
 print(p.getName())
 # print(p.setName('Jo'))
@@ -82,8 +81,7 @@ print(epub.i)
 
 
 # Eigen
-print()
-print(____ + '\n# Eigen' + ____)
+print('\n' + ____ + 'Eigen' + ____)
 # type does not matter when passing by value: casting of array elements is done during copy
 print(hpb.eig_add_mat3d(np.eye(3, dtype=np.int32), np.eye(3, dtype=np.float128)))
 # print(hpb.compose_affine(np.eye(4), np.eye(4)))  # no implicit casting from numpy array to Eigen::Transform
@@ -113,9 +111,10 @@ c = a.copy_matrix(); print('c: ', c.flags.owndata, c.flags.writeable)
 print('a.copy_matrix() took (s): ', time.time() - t)
 # m[5,6] and v[5,6] refer to the same element, c[5,6] does not.
 
+print('\n' + ____ + "Quaternions" + ____)
 t1 = time.time()
-q1 = np.arange(4)  # int64
-q2 = np.arange(4, dtype=np.float32)  # why not  float32
+q1 = np.arange(4)
+q2 = np.arange(3,-1,step=-1)
 
 # np.quaternion uses the same convention as Eigen for constructing quaternion
 # from individual elements BUT also for internal storage (?) / viewing
@@ -123,27 +122,21 @@ q2 = np.arange(4, dtype=np.float32)  # why not  float32
 qq1 = np.quaternion(q1[3], q1[0], q1[1], q1[2])
 qq2 = np.quaternion(q2[3], q2[0], q2[1], q2[2])
 
-
-# copy one quaternion, alright
-qd3 = hpb.eig_quat_mult(q1, q2)
-qf3 = hpb.eig_quat_mult(q1, q2)
-print('qd3: ', qd3, qd3.dtype)
-print('qf3: ', qf3, qf3.dtype)
-
-# print('Cast q1, q2 to float32 (C++ floats)')
-# q1 = np.array(q1, dtype=np.float32)
-# q2 = np.array(q2, dtype=np.float32)
 print('q1: ', q1, q1.dtype)
-print('q2: ', q2, q2.dtype)
-qd3 = hpb.eig_quat_mult(q1, q2)
-qf3 = hpb.eig_quat_mult(q1, q2)
-print('qd3: ', qd3, qd3.dtype)
-print('qf3: ', qf3, qf3.dtype)
+qe3 = hpb.eig_quat_mult(q1, q2)
+print('qe3: ', qe3, qe3.dtype)
 qq3 = qq1 * qq2
 print('Check computation is ok')
 print('qq3:', qq3.x, qq3.y, qq3.z, qq3.w)
 
-# Accessing raw array buffer and modificating it
+# print('Cast q1, q2 to float32 (C++ floats)')
+qf1 = np.array(q1, dtype=np.float32)
+print('qf1: ', qf1, qf1.dtype)
+qf11 = hpb.eig_quat_mult(qf1, qf1)
+print('qf11: ', qf11, qf11.dtype)
+
+print('\n' + ____ + "Raw array" + ____)
+# Accessing raw array buffer and modifying it
 a = np.arange(8, dtype=np.float64).reshape((2,2,2))
 a = np.arange(8).reshape((2,2,2))
 print(hpb.sum_3d(a))
@@ -151,8 +144,17 @@ a = a.astype(np.float64)  # we have enforced increment_3d to work only with doub
 hpb.increment_3d(a)
 print(hpb.sum_3d(a))
 
+print('\n' + ____ + "Transforms" + ____)
 # numpy to Eigen::Transform
-m1 = np.arange(16).reshape((4,4))
+m1 = np.arange(16, dtype=np.float64).reshape((4,4))
 print("m1\n", m1)
+# print("m1 flags\n", m1.flags)
 m2 = hpb.pass_through(m1)
 print("m2\n", m2)
+# print("m2 flags\n", m2.flags)
+print("m2.dtype", m2.dtype)
+
+m1 = np.arange(16, dtype=np.float32).reshape((4,4))
+m2 = hpb.pass_through(m1)
+print("m2\n", m2)
+print("m2.dtype", m2.dtype)
