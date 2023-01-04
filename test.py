@@ -18,44 +18,53 @@ print(hpb.mult(2.0,3.0))
 
 
 print('\n' + ____ + '\n# OOP' + ____)
-p = hpb.Pet('Jamy')
-print(p.getName())
+pet = hpb.Pet('Jamy')
+print(pet.getName())
 # print(p.setName('Jo'))
-print(p.getName())
-p.name = 'Josy'  # name is explicitely bound and is public
-print(p.name)
-print(p)  # calls
+print(pet.getName())
+pet.name = 'Josy'  # name is explicitely bound and is public
+print(pet.name)
+print(pet)  # calls
 
-p2 = hpb.Pet2('Jose')
-p2.name  # name is a property here
-print(p2.name)
+pet2 = hpb.Pet2('Jose')
+pet2.name  # name is a property here
+print(pet2.name)
 
 # Dynamic attributes
 # p.random_att_name = 'hey'  # NOPE: dynamic attr not valid by default contrary to python objects 
-p2.random_att_name = 'hey'  # OK cause p2 has dynamic attr
+pet2.random_att_name = 'hey'  # OK cause p2 has dynamic attr
 # p2.name = 234324  # NOPE: name is declared as string, not dynamic
-print(p2.__dict__)
+print(pet2.__dict__)
 
 # Inheritance
-d = hpb.Dog()
-print(d.getName())
-d = hpb.Dog("Milou")
-print(d.getName())
-d.setName('Loumi')
-print(d.name)
-print(d.bark())
+dog = hpb.Dog()
+print(dog.getName())
+dog = hpb.Dog("Milou")
+print(dog.getName())
+dog.setName('Loumi')
+print(dog.name)
+print(dog.bark())
 
 # Default in C++: inheritance is non polymormic
 # So a Pet pointer to a Dog object is seen only as a Pet on python side 
-p = hpb.pet_store()
-print(type(d))
-print(type(p))
+pet = hpb.factory_dog_nonpoly()
+dog = hpb.Dog()
+print(type(pet))
+print(type(dog))
 
 # Polymorphic inheritance: just need one virtual function in Base class to change the behavior to a polymorphic type!
 # Usual behavior for C++: for polymorphic classes, a Base pointer to a Derived class has access to Derived class functions
-pp = hpb.pet_store2()
-print(type(pp))
-print(pp.bark())
+poly_pet = hpb.PolymorphicPet('PolyPetty')
+poly_dog = hpb.factory_dog_poly()
+print(type(poly_pet))
+print(type(poly_dog))
+print(poly_dog.bark())
+
+# calling functions with
+print(hpb.get_pet_couple(poly_pet, poly_pet))
+# print(hpb.get_dog_couple(poly_pet, poly_pet))  # NOPE (normal)
+print(hpb.get_dog_couple(poly_dog, poly_dog))
+print(hpb.get_pet_couple(poly_dog, poly_dog))
 
 # Overloading
 o = hpb.Overlord()
@@ -80,7 +89,9 @@ print(epri.i)
 print(epub.i)
 
 
-# Eigen
+
+
+
 print('\n' + ____ + 'Eigen' + ____)
 # type does not matter when passing by value: casting of array elements is done during copy
 print(hpb.eig_add_mat3d(np.eye(3, dtype=np.int32), np.eye(3, dtype=np.float128)))

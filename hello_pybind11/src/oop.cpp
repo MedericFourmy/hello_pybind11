@@ -29,7 +29,7 @@ void basic_class_def(py::module &m){
         .def("setName", &Pet::setName)
         .def("__repr__",
         [](const Pet &a) {
-            return "<example.Pet named '" + a.name + "'>";
+            return "calling __repr__ test: <Pet named '" + a.name + "'>";
         })  // possible to bind lambda functions!
         .def_readwrite("name", &Pet::name)  // works only for public variables, also def_readonly for const attributes
         ;
@@ -53,10 +53,18 @@ struct Dog : Pet {
 
 // Polymorphic inheritance 
 struct PolymorphicPet {
+    PolymorphicPet(const std::string &name) : name(name) { }
+    void setName(const std::string &name_) { name = name_; }
+    const std::string &getName() const { return name; }
+
+    // have at least one virtual method to make inheritance polymorphic
     virtual ~PolymorphicPet() = default;
+
+    std::string name;
 };
 
 struct PolymorphicDog : PolymorphicPet {
+    PolymorphicDog(const std::string &name) : PolymorphicPet(name) { }
     std::string bark() const { return "woof!"; }
 };
 
@@ -74,17 +82,19 @@ void checking_inheritance_polymorphism(py::module &m){
         .def(py::init<>())
         .def(py::init<const std::string &>())
         .def("bark", &Dog::bark);
-    m.def("pet_store", []() { return std::unique_ptr<Pet>(new Dog("Molly")); });  // just to show non-polymorphic inheritance resulting behaviour
+    m.def("factory_dog_nonpoly", []() { return std::unique_ptr<Pet>(new Dog("Doggy")); });  // just to show non-polymorphic inheritance resulting behaviour -> Dog seen as Pet in Python
     
     // Polymorphic inheritance
     // Same binding code
-    py::class_<PolymorphicPet>(m, "PolymorphicPet");
+    py::class_<PolymorphicPet>(m, "PolymorphicPet")
+        .def(py::init<const std::string &>())
+    ;
     py::class_<PolymorphicDog, PolymorphicPet>(m, "PolymorphicDog")
-        .def(py::init<>())
+        .def(py::init<const std::string &>())
         .def("bark", &PolymorphicDog::bark);
 
     // Again, return a base pointer to a derived instance
-    m.def("pet_store2", []() { return std::unique_ptr<PolymorphicPet>(new PolymorphicDog); });
+    m.def("factory_dog_poly", []() { return std::unique_ptr<PolymorphicPet>(new PolymorphicDog("PolyDoggy")); });
 }
 
 
@@ -121,7 +131,6 @@ void overloading_functions(py::module &m){
         .def("getName", py::overload_cast<>(&Overlord::getName), "Get the overlord's name")
         .def("getAge", py::overload_cast<>(&Overlord::getAge), "Get the overlord's age")
         .def("getAge", py::overload_cast<>(&Overlord::getAge, py::const_), "Get the overlord's age");  // const attibute overloading must be specified
-
 }
 
 
@@ -222,10 +231,22 @@ void custom_constructors(py::module &m){
 
 };
 
+std::string get_pet_couple(const PolymorphicPet &p1, const PolymorphicPet &p2){
+    return p1.getName() + " and " + p2.getName();
+}
+
+std::string get_dog_couple(const PolymorphicDog &d1, const PolymorphicDog &d2){
+    return d1.getName() + " and " + d2.getName();
+}
+
+
 void def_examples_oop(py::module &m) {
     basic_class_def(m);
     checking_inheritance_polymorphism(m);
     overloading_functions(m);
     internal_types(m);
     custom_constructors(m);
+
+    m.def("get_pet_couple", &get_pet_couple);
+    m.def("get_dog_couple", &get_dog_couple);
 }
